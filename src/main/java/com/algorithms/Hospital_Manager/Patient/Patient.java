@@ -1,34 +1,41 @@
 package com.algorithms.Hospital_Manager.Patient;
 
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Period;
+
+@Entity
+@Table
 public class Patient {
-    private int position;
+    @Id
+    @SequenceGenerator(name = "patient_sequence", sequenceName = "patient_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patient_sequence")
+    private Long id;
     private String name;
+    private LocalDate birthDate;
+    private String gender;
     private int injurySeverity;
-    private Long waitingTime;
+    private LocalTime checkInTime;
+    @Transient
+    private Integer age;
 
     public Patient() {
     }
 
-    public Patient(int position, String name, int injurySeverity) {
-        this.position = position;
+    public Patient(String name, LocalDate birthDate, String gender, int injurySeverity) {
         this.name = name;
+        this.birthDate = birthDate;
+        this.gender = gender;
         this.injurySeverity = injurySeverity;
-        this.waitingTime = 0L;
+        this.checkInTime = LocalTime.now();
     }
 
-    public Patient(int position, String name, int injurySeverity, Long waitingTime) {
-        this.position = position;
-        this.name = name;
-        this.waitingTime = waitingTime;
-        this.injurySeverity = injurySeverity;
-    }
+    public Long getId() { return id; }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
+    public void setId(Long position) {
+        this.id = position;
     }
 
     public String getName() {
@@ -39,12 +46,10 @@ public class Patient {
         this.name = name;
     }
 
-    public Long getWaitingTime() {
-        return waitingTime;
-    }
+    public LocalTime getCheckInTime() { return checkInTime; }
 
-    public void setWaitingTime(Long waitingTime) {
-        this.waitingTime = waitingTime;
+    public void setCheckInTime(LocalTime checkInTime) {
+        this.checkInTime = checkInTime;
     }
 
     public int getInjurySeverity() {
@@ -55,13 +60,30 @@ public class Patient {
         this.injurySeverity = injurySeverity;
     }
 
+    public LocalDate getBirthDate() { return birthDate; }
+
+    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
+
+    public String getGender() { return gender; }
+
+    public void setGender(String gender) { this.gender = gender; }
+
+    public Integer getAge() {
+        return Period.between(this.birthDate, LocalDate.now()).getYears();
+    }
+
+    public void setAge(Integer age) { this.age = age; }
+
     @Override
     public String toString() {
         return "Patient{" +
-                "position=" + position +
+                "id=" + id +
                 ", name='" + name + '\'' +
-                ", waitingTime=" + waitingTime +
+                ", birthDate=" + birthDate +
+                ", gender='" + gender + '\'' +
                 ", injurySeverity=" + injurySeverity +
+                ", checkInTime=" + checkInTime +
+                ", age=" + age +
                 '}';
     }
 }
