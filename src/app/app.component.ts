@@ -26,55 +26,49 @@ export class AppComponent implements OnInit{
 
   public getPatients(): void {
     this.patientService.getPatients().subscribe(
-      (response: Patient[]) => {
-        this.patients = response; 
-      }, 
-      (error: HttpErrorResponse) => {
-        alert(error.message); 
+      {
+        next: (response: Patient[]) => {
+          this.patients = response; 
+          console.log(this.patients);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.log(err);
+        },
+        complete: () => {
+          console.log('complete');
+        }
       }
     ); 
   }
 
   public onAddPatient(addForm: NgForm): void {
     document.getElementById('add-patient-form')?.click();
-    this.patientService.addPatient(addForm.value).subscribe(
-      (response: Patient) => {
+    this.patientService.addPatient(addForm.value).subscribe({
+      next: (response: Patient) => {
         console.log(response);
         this.getPatients();
         addForm.reset();
       },
-      (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         alert(error.message);
         addForm.reset();
+      },
+      complete: () => {
+        console.log('complete');
       }
+    }
     );
   }
 
   public onUpdatePatient(patient: Patient): void {
-    this.patientService.updatePatient(patient).subscribe(
-      (response: Patient) => {
-        console.log(response);
-        this.getPatients();
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
+    this.patientService.updatePatient(patient);
   }
 
   public onNextPatient(): void {
-    this.patientService.nextPatient().subscribe(
-      (response: void) => {
-        console.log(response);
-        this.getPatients();
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
+    this.patientService.nextPatient();
   }
 
-  public onOpenModal(patient: Patient, mode: string): void {
+  public onOpenModal(patient: Patient | null, mode: string): void {
     const container = document.getElementById('main-container');
     const button = document.createElement('button');
     button.type = 'button';
@@ -84,11 +78,9 @@ export class AppComponent implements OnInit{
       button.setAttribute('data-target', '#addEmployeeModal');
     }
     if (mode === 'edit') {
-      this.editPatient = patient;
       button.setAttribute('data-target', '#updateEmployeeModal');
     }
     if (mode === 'delete') {
-      this.deletePatient = patient;
       button.setAttribute('data-target', '#deleteEmployeeModal');
     }
     container?.appendChild(button);
